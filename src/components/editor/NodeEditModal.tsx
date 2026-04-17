@@ -213,7 +213,7 @@ export default function NodeEditModal() {
                               type="text"
                               value={cond.variableName}
                               onChange={(e) => setCondition(i, { variableName: e.target.value })}
-                              className="w-full border border-gray-200 rounded px-2 py-1.5 text-xs"
+                              className="w-full border border-gray-200 rounded px-2 py-1.5 text-xs bg-white text-gray-700"
                             />
                           </div>
                           <div>
@@ -225,10 +225,10 @@ export default function NodeEditModal() {
                                   comparator: e.target.value as DecisionCondition['comparator'],
                                 })
                               }
-                              className="w-full border border-gray-200 rounded px-2 py-1.5 text-xs"
+                              className="w-full border border-gray-200 rounded px-2 py-1.5 text-xs bg-white font-semibold text-gray-700"
                             >
                               {COMPARATORS.map((c) => (
-                                <option key={c} value={c}>
+                                <option key={c} value={c} >
                                   {c}
                                 </option>
                               ))}
@@ -240,7 +240,7 @@ export default function NodeEditModal() {
                               type="text"
                               value={String(cond.value)}
                               onChange={(e) => setCondition(i, { value: e.target.value })}
-                              className="w-full border border-gray-200 rounded px-2 py-1.5 text-xs"
+                              className="w-full border border-gray-500 rounded px-2 py-1.5 text-xs bg-white text-gray-700"
                             />
                           </div>
                         </div>
