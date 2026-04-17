@@ -1,9 +1,11 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { libraryWorkflows } from '@/lib/mock-data';
 import type { Workflow, WorkflowStatus } from '@/types';
 import Link from 'next/link';
+import { useAppStore } from '@/lib/store';
 
 const statusConfig: Record<WorkflowStatus, { label: string; color: string; icon: string }> = {
   draft: { label: 'Draft', color: 'bg-gray-100 text-gray-600', icon: '📝' },
@@ -12,8 +14,17 @@ const statusConfig: Record<WorkflowStatus, { label: string; color: string; icon:
 };
 
 function WorkflowCard({ workflow }: { workflow: Workflow }) {
+  const router = useRouter();
+  const { setNodes, setEdges, setVariables: setWfVariables, setWorkflowName, loadSampleWorkflow } = useAppStore();
   const status = statusConfig[workflow.status];
   const updatedAgo = getTimeAgo(workflow.updatedAt);
+
+  const handleOpen = () => {
+    // For the POC, we load the sample workflow from mock data
+    // In production, this would fetch from API based on workflow.id
+    loadSampleWorkflow();
+    router.push('/');
+  };
 
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-5 hover:shadow-lg transition-all hover:border-blue-300 group">
@@ -37,9 +48,9 @@ function WorkflowCard({ workflow }: { workflow: Workflow }) {
       </div>
 
       <div className="flex gap-2">
-        <Link href="/" className="px-3 py-1.5 text-xs bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium">
+        <button onClick={handleOpen} className="px-3 py-1.5 text-xs bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium">
           Open
-        </Link>
+        </button>
         <button className="px-3 py-1.5 text-xs bg-gray-100 text-gray-600 rounded-md hover:bg-gray-200">
           Export
         </button>

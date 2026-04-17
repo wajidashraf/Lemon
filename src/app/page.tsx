@@ -11,18 +11,18 @@ export default function WorkspacePage() {
   return (
     <ReactFlowProvider>
       <div className="flex h-[calc(100vh-48px)]">
-        {/* Chat Panel - 35% */}
+        {/* Chat Panel — 35% */}
         <div className="w-[35%] min-w-[320px] border-r border-gray-200">
           <ChatPanel />
         </div>
 
-        {/* Visual Editor - 65% */}
-        <div className="flex-1">
+        {/* Visual Editor — 65% (includes NodeEditModal, ContextMenu, PropertiesPanel internally) */}
+        <div className="flex-1 min-w-0">
           <WorkflowEditor />
         </div>
       </div>
 
-      {/* Modals */}
+      {/* Global modals */}
       <PreviewModal />
       <ExportModal />
       <ValidationModal />

@@ -1,14 +1,48 @@
 'use client';
 
+import { useCallback } from 'react';
 import { Handle, Position, type NodeProps } from '@xyflow/react';
 import type { WorkflowNodeData } from '@/types';
+import { useAppStore } from '@/lib/store';
 
-const baseStyle = 'px-4 py-3 rounded-lg shadow-md border-2 min-w-[160px] text-center text-sm font-medium transition-all hover:shadow-lg';
+/* ── shared style ────────────────────────────────────────────────────────── */
+const base =
+  'px-4 py-3 rounded-lg shadow-md border-2 min-w-[160px] text-center text-sm font-medium transition-all hover:shadow-xl group relative cursor-pointer';
 
-export function StartNode({ data, selected }: NodeProps) {
-  const d = data as WorkflowNodeData;
+/* ── tiny edit-hint that floats on hover ────────────────────────────────── */
+function EditHint() {
   return (
-    <div className={`${baseStyle} bg-emerald-50 border-emerald-500 ${selected ? 'ring-2 ring-emerald-400 ring-offset-2' : ''}`}>
+    <span className="absolute -top-6 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-[9px] px-2 py-0.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
+      Double-click to edit
+    </span>
+  );
+}
+
+/* ── hook: open edit modal on double-click ──────────────────────────────── */
+function useOpenEdit(id: string) {
+  const setEditingNodeId = useAppStore((s) => s.setEditingNodeId);
+  return useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      setEditingNodeId(id);
+    },
+    [id, setEditingNodeId],
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────────────────── *
+ *  Node renderers
+ * ─────────────────────────────────────────────────────────────────────────── */
+
+export function StartNode({ data, selected, id }: NodeProps) {
+  const d = data as WorkflowNodeData;
+  const onDoubleClick = useOpenEdit(id);
+  return (
+    <div
+      onDoubleClick={onDoubleClick}
+      className={`${base} bg-emerald-50 border-emerald-500 ${selected ? 'ring-2 ring-emerald-400 ring-offset-2' : ''}`}
+    >
+      <EditHint />
       <div className="flex items-center justify-center gap-2">
         <span className="text-emerald-600 text-lg">▶</span>
         <span className="text-emerald-800">{d.label}</span>
@@ -19,10 +53,15 @@ export function StartNode({ data, selected }: NodeProps) {
   );
 }
 
-export function ProcessNode({ data, selected }: NodeProps) {
+export function ProcessNode({ data, selected, id }: NodeProps) {
   const d = data as WorkflowNodeData;
+  const onDoubleClick = useOpenEdit(id);
   return (
-    <div className={`${baseStyle} bg-blue-50 border-blue-500 ${selected ? 'ring-2 ring-blue-400 ring-offset-2' : ''}`}>
+    <div
+      onDoubleClick={onDoubleClick}
+      className={`${base} bg-blue-50 border-blue-500 ${selected ? 'ring-2 ring-blue-400 ring-offset-2' : ''}`}
+    >
+      <EditHint />
       <Handle type="target" position={Position.Top} className="!bg-blue-500 !w-3 !h-3" />
       <div className="flex items-center justify-center gap-2">
         <span className="text-blue-600 text-lg">⚙</span>
@@ -34,12 +73,17 @@ export function ProcessNode({ data, selected }: NodeProps) {
   );
 }
 
-export function DecisionNode({ data, selected }: NodeProps) {
+export function DecisionNode({ data, selected, id }: NodeProps) {
   const d = data as WorkflowNodeData;
   const condition = d.config?.conditions?.[0];
+  const onDoubleClick = useOpenEdit(id);
   return (
-    <div className={`${baseStyle} bg-amber-50 border-amber-500 rotate-0 ${selected ? 'ring-2 ring-amber-400 ring-offset-2' : ''}`}
-         style={{ clipPath: 'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)', minWidth: '180px', padding: '30px 20px' }}>
+    <div
+      onDoubleClick={onDoubleClick}
+      className={`${base} bg-amber-50 border-amber-500 ${selected ? 'ring-2 ring-amber-400 ring-offset-2' : ''}`}
+      style={{ clipPath: 'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)', minWidth: '180px', padding: '30px 20px' }}
+    >
+      <EditHint />
       <Handle type="target" position={Position.Top} className="!bg-amber-500 !w-3 !h-3" />
       <div className="text-amber-800 text-xs font-bold">{d.label}</div>
       {condition && (
@@ -54,10 +98,15 @@ export function DecisionNode({ data, selected }: NodeProps) {
   );
 }
 
-export function CalculationNode({ data, selected }: NodeProps) {
+export function CalculationNode({ data, selected, id }: NodeProps) {
   const d = data as WorkflowNodeData;
+  const onDoubleClick = useOpenEdit(id);
   return (
-    <div className={`${baseStyle} bg-purple-50 border-purple-500 ${selected ? 'ring-2 ring-purple-400 ring-offset-2' : ''}`}>
+    <div
+      onDoubleClick={onDoubleClick}
+      className={`${base} bg-purple-50 border-purple-500 ${selected ? 'ring-2 ring-purple-400 ring-offset-2' : ''}`}
+    >
+      <EditHint />
       <Handle type="target" position={Position.Top} className="!bg-purple-500 !w-3 !h-3" />
       <div className="flex items-center justify-center gap-2">
         <span className="text-purple-600 text-lg">∑</span>
@@ -72,10 +121,15 @@ export function CalculationNode({ data, selected }: NodeProps) {
   );
 }
 
-export function SubprocessNode({ data, selected }: NodeProps) {
+export function SubprocessNode({ data, selected, id }: NodeProps) {
   const d = data as WorkflowNodeData;
+  const onDoubleClick = useOpenEdit(id);
   return (
-    <div className={`${baseStyle} bg-cyan-50 border-cyan-500 border-double border-4 ${selected ? 'ring-2 ring-cyan-400 ring-offset-2' : ''}`}>
+    <div
+      onDoubleClick={onDoubleClick}
+      className={`${base} bg-cyan-50 border-cyan-500 border-double border-4 ${selected ? 'ring-2 ring-cyan-400 ring-offset-2' : ''}`}
+    >
+      <EditHint />
       <Handle type="target" position={Position.Top} className="!bg-cyan-500 !w-3 !h-3" />
       <div className="flex items-center justify-center gap-2">
         <span className="text-cyan-600 text-lg">↗</span>
@@ -87,10 +141,15 @@ export function SubprocessNode({ data, selected }: NodeProps) {
   );
 }
 
-export function EndNode({ data, selected }: NodeProps) {
+export function EndNode({ data, selected, id }: NodeProps) {
   const d = data as WorkflowNodeData;
+  const onDoubleClick = useOpenEdit(id);
   return (
-    <div className={`${baseStyle} bg-red-50 border-red-500 rounded-full ${selected ? 'ring-2 ring-red-400 ring-offset-2' : ''}`}>
+    <div
+      onDoubleClick={onDoubleClick}
+      className={`${base} bg-red-50 border-red-500 rounded-full ${selected ? 'ring-2 ring-red-400 ring-offset-2' : ''}`}
+    >
+      <EditHint />
       <Handle type="target" position={Position.Top} className="!bg-red-500 !w-3 !h-3" />
       <div className="flex items-center justify-center gap-2">
         <span className="text-red-600 text-lg">⏹</span>
